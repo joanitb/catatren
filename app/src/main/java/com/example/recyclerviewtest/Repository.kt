@@ -1,7 +1,10 @@
+import com.example.mytodolist.retrofit.ApiInterface
+import com.example.recyclerviewtest.DatosEstacion
+import retrofit2.Response
+
 class Repository {
-    private val apiInterface = apiInterface.create()
+    private val apiInterface = ApiInterface.create()
     suspend fun fetchData(url: String): Response<List<DatosEstacion>> {
-        val response = apiInterface.getFromAPI(url)
-        return response
+        return apiInterface.getFromAPI(url)
     }
 }

@@ -1,9 +1,6 @@
 package com.example.mytodolist.retrofit
 
-import com.example.mytodolist.model.list.ListTask
-import com.example.mytodolist.model.list.ListTasksInsertData
-import com.example.mytodolist.model.task.Task
-import com.example.mytodolist.model.task.TaskInsertData
+import com.example.recyclerviewtest.DatosEstacion
 import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Response
