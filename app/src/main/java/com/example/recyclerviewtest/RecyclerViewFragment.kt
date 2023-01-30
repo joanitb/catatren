@@ -1,6 +1,8 @@
 package com.example.recyclerviewtest
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,19 +12,17 @@ import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recyclerviewtest.databinding.FragmentRecyclerViewBinding
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.coroutines.coroutineContext
 
 class RecyclerViewFragment : Fragment(), OnClickListener {
 
     private lateinit var stationAdapter: StationAdapter
     private lateinit var linearLayoutManager: RecyclerView.LayoutManager
     private lateinit var binding: FragmentRecyclerViewBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onClick(station: DatosEstacion) {
         parentFragmentManager.setFragmentResult(
@@ -38,13 +38,21 @@ class RecyclerViewFragment : Fragment(), OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        stationAdapter = StationAdapter(getStations(), this)
-        linearLayoutManager = LinearLayoutManager(context)
+        runBlocking {
+            var stationList = emptyList<DatosEstacion>()
+            withContext(Dispatchers.Default){
+                stationList = getStations()
+            }
 
-        binding.recyclerView.apply {
-            setHasFixedSize(true)
-            layoutManager = linearLayoutManager
-            adapter = stationAdapter
+            println("DEBUG: Holaaaaaaa")
+            stationAdapter = StationAdapter(stationList, this@RecyclerViewFragment)
+            linearLayoutManager = LinearLayoutManager(context)
+            binding.recyclerView.apply {
+                setHasFixedSize(true)
+                layoutManager = linearLayoutManager
+                adapter = stationAdapter
+
+            }
         }
     }
 
@@ -54,25 +62,24 @@ class RecyclerViewFragment : Fragment(), OnClickListener {
         return binding.root
     }
 
-    private fun getStations(): MutableList<DatosEstacion>{
-        var stations: List<DatosEstacion>? = listOf(DatosEstacion(null,null,null,null,null,null,null,null))
+    private suspend fun getStations(): List<DatosEstacion>{
+        var stations: List<DatosEstacion> = emptyList()
         val call = RetrofitSingleton.service.getData()
         call.enqueue(object : Callback<List<DatosEstacion>> {
             override fun onResponse(call: Call<List<DatosEstacion>>, response: Response<List<DatosEstacion>>) {
                 if (response.isSuccessful) {
-                    stations = response.body()
-                    stations?.forEach(::println)
-                } else {
-                    println("Error getting data!")
-                }
+                    stations = response.body()!!
+                    stations.forEach{ station -> println("DEBUG: $station") }
+                } else stations = emptyList()
             }
 
             override fun onFailure(call: Call<List<DatosEstacion>>, t: Throwable) {
                 Log.e("ERROR", t.message.toString())
+                stations = emptyList()
             }
         })
 
-        if (stations != null) return stations!!.toMutableList()
-        else return mutableListOf(DatosEstacion(null,null,null,null,null,null,null,null))
+        println("DEBUG: Hola estoy aqui")
+        return stations
     }
 }
