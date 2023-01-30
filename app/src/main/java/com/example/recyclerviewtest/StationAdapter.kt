@@ -27,15 +27,15 @@ class StationAdapter(private val stations: List<DatosEstacion>, private val list
         val station = stations[position]
         with(holder){
             setListener(station)
-            binding.stationName.text = station.estacion
+            binding.stationName.text = station.Estacion
             binding.stationZone.text = station.zonaATMBarcelona
             Glide.with(context)
-                .load(station.url_foto)
+                .load(station.Foto)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
                 .into(binding.stationImage)
 
-            when (station.operadora){
+            when (station.Operadora){
                 "FMB" -> {
                     Glide.with(context)
                         .load("https://i.imgur.com/2rfV8H9.png")

@@ -30,10 +30,10 @@ class DetailFragment : Fragment() {
                 println(result)
                 val datosEstacion = result.getParcelable<DatosEstacion>("Station")
                 if (datosEstacion != null) {
-                    binding.stationName.text = datosEstacion.estacion
-                    binding.stationDesc.text = datosEstacion.descripcionDeLaEstacion
+                    binding.stationName.text = datosEstacion.Estacion
+                    binding.stationDesc.text = datosEstacion.DescripcionDeLaEstacion
                     Glide.with(this)
-                        .load(datosEstacion.url_foto)
+                        .load(datosEstacion.Foto)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .centerCrop()
                         .into(binding.image)
