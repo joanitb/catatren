@@ -38,21 +38,29 @@ class RecyclerViewFragment : Fragment(), OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        var stationList = emptyList<DatosEstacion>()
         runBlocking {
-            var stationList = emptyList<DatosEstacion>()
-            withContext(Dispatchers.Default){
-                stationList = getStations()
-            }
+            val apiInterface = ApiInterface.create().getData()
+            apiInterface.enqueue( object : Callback<List<DatosEstacion>>{
+                override fun onResponse(call: Call<List<DatosEstacion>>?, response: Response<List<DatosEstacion>>?) {
+                    if(response?.body() != null) stationList = response.body()!!
+                    stationAdapter.setStationListItems(response!!.body()!!)
+                    stationAdapter = StationAdapter(stationList, this@RecyclerViewFragment)
+                }
 
-            println("DEBUG: Holaaaaaaa")
-            stationAdapter = StationAdapter(stationList, this@RecyclerViewFragment)
-            linearLayoutManager = LinearLayoutManager(context)
-            binding.recyclerView.apply {
-                setHasFixedSize(true)
-                layoutManager = linearLayoutManager
-                adapter = stationAdapter
+                override fun onFailure(call: Call<List<DatosEstacion>>?, t: Throwable?) {
 
-            }
+                }
+            })
+        }
+        println("DEBUG: Holaaaaaaa")
+        stationAdapter = StationAdapter(stationList, this)
+        linearLayoutManager = LinearLayoutManager(context)
+        binding.recyclerView.apply {
+            setHasFixedSize(true)
+            layoutManager = linearLayoutManager
+            adapter = stationAdapter
+
         }
     }
 
@@ -60,26 +68,5 @@ class RecyclerViewFragment : Fragment(), OnClickListener {
         // Inflate the layout for this fragment
         binding = FragmentRecyclerViewBinding.inflate(inflater, container, false)
         return binding.root
-    }
-
-    private suspend fun getStations(): List<DatosEstacion>{
-        var stations: List<DatosEstacion> = emptyList()
-        val call = RetrofitSingleton.service.getData()
-        call.enqueue(object : Callback<List<DatosEstacion>> {
-            override fun onResponse(call: Call<List<DatosEstacion>>, response: Response<List<DatosEstacion>>) {
-                if (response.isSuccessful) {
-                    stations = response.body()!!
-                    stations.forEach{ station -> println("DEBUG: $station") }
-                } else stations = emptyList()
-            }
-
-            override fun onFailure(call: Call<List<DatosEstacion>>, t: Throwable) {
-                Log.e("ERROR", t.message.toString())
-                stations = emptyList()
-            }
-        })
-
-        println("DEBUG: Hola estoy aqui")
-        return stations
     }
 }

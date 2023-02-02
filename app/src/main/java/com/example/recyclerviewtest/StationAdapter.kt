@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.recyclerviewtest.databinding.ItemUserBinding
 
-class StationAdapter(private val stations: List<DatosEstacion>, private val listener: OnClickListener): RecyclerView.Adapter<StationAdapter.ViewHolder>() {
+class StationAdapter(private var stations: List<DatosEstacion>, private val listener: OnClickListener): RecyclerView.Adapter<StationAdapter.ViewHolder>() {
 
     private lateinit var context: Context
 
@@ -78,5 +78,9 @@ class StationAdapter(private val stations: List<DatosEstacion>, private val list
                 listener.onClick(station)
             }
         }
+    }
+
+    fun setStationListItems(stationList: List<DatosEstacion>){
+        this.stations = stationList;
     }
 }
